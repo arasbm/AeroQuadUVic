@@ -1,5 +1,5 @@
 /*
-  AeroQuad v2.3 - Feburary 2011
+  AeroQuad v2.3 - March 2011
   www.AeroQuad.com
   Copyright (c) 2011 Ted Carancho.  All rights reserved.
   An Open Source Arduino based multicopter.
@@ -30,14 +30,15 @@ class Compass {
 public:
   float magMax[3];
   float magMin[3];
+  float magCalibration[3];
   float magScale[3];
   float magOffset[3];
   float hdgX;
   float hdgY;
   int   compassAddress;
-  int   measuredMagX;
-  int   measuredMagY;
-  int   measuredMagZ;
+  float measuredMagX;
+  float measuredMagY;
+  float measuredMagZ;
   
   Compass(void) {}
 
@@ -99,10 +100,48 @@ public:
   // Initialize AeroQuad Mega v2.0 Magnetometer
   ////////////////////////////////////////////////////////////////////////////////
 
- void initialize(void) {
-    updateRegisterI2C(compassAddress, 0x01, 0x20);
-    updateRegisterI2C(compassAddress, 0x02, 0x00); // continuous 10Hz mode
+  void initialize(void) {
+    byte numAttempts = 0;
+    bool success = false;
+    delay(10);                             // Power up delay **
+   
+    magCalibration[XAXIS] = 1.0;
+    magCalibration[YAXIS] = 1.0;
+    magCalibration[ZAXIS] = 1.0;
     
+    while (success == false && numAttempts < 5 ) {
+      
+      numAttempts++;
+   
+      updateRegisterI2C(0x1E, 0x00, 0x11);  // Set positive bias configuration for sensor calibraiton
+      delay(50);
+   
+      updateRegisterI2C(compassAddress, 0x01, 0x20); // Set +/- 1G gain
+      delay(10);
+
+      updateRegisterI2C(0x1E, 0x02, 0x01);  // Perform single conversion
+      delay(10);
+   
+      measure(0.0, 0.0);                    // Read calibration data
+      delay(10);
+   
+      if ( fabs(measuredMagX) > 500.0 && fabs(measuredMagX) < 1000.0 \
+          && fabs(measuredMagY) > 500.0 && fabs(measuredMagY) < 1000.0 \
+          && fabs(measuredMagZ) > 500.0 && fabs(measuredMagZ) < 1000.0) {
+        magCalibration[XAXIS] = fabs(715.0 / measuredMagX);
+        magCalibration[YAXIS] = fabs(715.0 / measuredMagY);
+        magCalibration[ZAXIS] = fabs(715.0 / measuredMagZ);
+    
+        success = true;
+      }
+   
+      updateRegisterI2C(compassAddress, 0x00, 0x10);  // Set 10hz update rate and normal operaiton
+      delay(50);
+
+      updateRegisterI2C(compassAddress, 0x02, 0x00); // Continuous Update mode
+      delay(50);                           // Mode change delay (1/Update Rate) **
+    }
+
     measure(0.0, 0.0);  // Assume 1st measurement at 0 degrees roll and 0 degrees pitch
   }
   
@@ -117,9 +156,11 @@ public:
     
     sendByteI2C(compassAddress, 0x03);
     Wire.requestFrom(compassAddress, 6);
-      measuredMagX = (Wire.receive() << 8) | Wire.receive();
-      measuredMagY = (Wire.receive() << 8) | Wire.receive();
-      measuredMagZ = (Wire.receive() << 8) | Wire.receive();
+
+    measuredMagX =  ((Wire.receive() << 8) | Wire.receive()) * magCalibration[XAXIS];
+    measuredMagY = -((Wire.receive() << 8) | Wire.receive()) * magCalibration[YAXIS];
+    measuredMagZ = -((Wire.receive() << 8) | Wire.receive()) * magCalibration[ZAXIS];
+
     Wire.endTransmission();
 
     cosRoll =  cos(roll);
@@ -136,8 +177,9 @@ public:
 
     tmp  = sqrt(magX * magX + magY * magY);
     
-    hdgX = -magX / tmp;
+    hdgX = magX / tmp;
     hdgY = -magY / tmp;
+
   }
 };
 

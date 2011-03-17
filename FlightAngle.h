@@ -1,5 +1,5 @@
 /*
-  AeroQuad v2.3 - Feburary 2011
+  AeroQuad v2.3 - March 2011
   www.AeroQuad.com
   Copyright (c) 2011 Ted Carancho.  All rights reserved.
   An Open Source Arduino based multicopter.
@@ -32,9 +32,11 @@ public:
   float earthAccel[3];
   
   FlightAngle(void) {
-    angle[ROLL] = 0;
-    angle[PITCH] = 0;
-    angle[YAW] = 0;
+    for (byte axis = ROLL; axis < LASTAXIS; axis++)
+      angle[axis] = 0.0;
+    //angle[ROLL] = 0;
+    //angle[PITCH] = 0;
+    //angle[YAW] = 0;
     gyroAngle[ROLL] = 0;
     gyroAngle[PITCH] = 0;
   }
@@ -46,13 +48,26 @@ public:
   virtual float getGyroUnbias(byte axis);
   virtual void calibrate();
  
+  // returns the angle of a specific axis in SI units (radians)
   const float getData(byte axis) {
     return angle[axis];
   }
+  // return heading as +PI/-PI
+  const float getHeading(byte axis) {
+    return(angle[axis]);
+  }
   
-  const float getHeading(void) {
-    // Change from +/-180 to 0-360
-    return (PI + angle[YAW]);
+  // This really needs to be in Radians to be consistent
+  // I'll fix later - AKA
+  // returns heading in degrees as 0-360
+  const float getDegreesHeading(byte axis) {
+    float tDegrees;
+    
+    tDegrees = degrees(angle[axis]);
+    if (tDegrees < 0.0)
+      return (tDegrees + 360.0);
+    else
+      return (tDegrees);
   }
   
   const byte getType(void) {
@@ -151,10 +166,12 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
   float accelMagnitude;
   float accelVector[3];
   float accelWeight;
-  float errorCourse;
   float errorRollPitch[3];
+#ifdef HeadingMagHold  
+  float errorCourse;
   float errorYaw[3];
   float scaledOmegaP[3];
+#endif  
   float scaledOmegaI[3];
   
   //  Roll and Pitch Compensation
@@ -218,7 +235,7 @@ void driftCorrection(float ax, float ay, float az, float oneG, float magX, float
 void eulerAngles(void)
 {
   angle[ROLL]  =  atan2(dcmMatrix[7], dcmMatrix[8]);
-  angle[PITCH] =  asin(dcmMatrix[6]);
+  angle[PITCH] =  -asin(dcmMatrix[6]);
   angle[YAW]   =  atan2(dcmMatrix[3], dcmMatrix[0]);
 } 
   
@@ -262,11 +279,11 @@ public:
     dcmMatrix[7] =  0;
     dcmMatrix[8] =  1;
 
-    kpRollPitch = 1.6;
-    kiRollPitch = 0.005;
+    kpRollPitch = 1.0;
+    kiRollPitch = 0.002;
     
-    kpYaw = -1.6;
-    kiYaw = -0.005;
+    kpYaw = -1.0;
+    kiYaw = -0.002;
   }
   
 ////////////////////////////////////////////////////////////////////////////////

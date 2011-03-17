@@ -1,5 +1,5 @@
 /*
-  AeroQuad v2.3 - Feburary 2011
+  AeroQuad v2.3 - March 2011
   www.AeroQuad.com
   Copyright (c) 2011 Ted Carancho.  All rights reserved.
   An Open Source Arduino based multicopter.
@@ -26,8 +26,8 @@
 // Flight Software Version
 #define VERSION 2.3
 
-#define BAUD 115200
-//#define BAUD 111111 // use this to be compatible with USB and XBee connections
+//#define BAUD 115200
+#define BAUD 111111 // use this to be compatible with USB and XBee connections
 //#define BAUD 57600
 #define LEDPIN 13
 #define ON 1
@@ -145,7 +145,8 @@ byte flightMode;
 int minAcro; // Read in from EEPROM, defines min throttle during flips
 
 // Auto level setup
-int levelAdjust[2] = {0,0};
+float levelAdjust[2] = {0.0,0.0};
+//int levelAdjust[2] = {0,0};
 int levelLimit; // Read in from EEPROM
 int levelOff; // Read in from EEPROM
 // Scale to convert 1000-2000 PWM to +/- 45 degrees
@@ -164,16 +165,22 @@ float commandedYaw = 0;
 float headingHold = 0; // calculated adjustment for quad to go to heading (PID output)
 float heading = 0; // measured heading from yaw gyro (process variable)
 float relativeHeading = 0; // current heading the quad is set to (set point)
-float absoluteHeading = 0;;
+//float absoluteHeading = 0;;
 float setHeading = 0;
 
+// batteryMonitor & Altutude Hold
+int throttle = 1000;
+int autoDescent = 0;
+
 // Altitude Hold
+#define ALTPANIC 2 // special state that allows immediate turn off of Altitude hold if large throttle changesa are made at the TX
+#define ALTBUMP 90 // amount of stick movement to cause an altutude bump (up or down)
+#define PANICSTICK_MOVEMENT 250 // 80 if althold on and throttle commanded to move by a gross amount, set PANIC
+//#define MINSTICK_MOVEMENT 32 // any movement less than this doesn't not trigger a rest of the holdaltitude
 #define TEMPERATURE 0
 #define PRESSURE 1
 int throttleAdjust = 0;
-int throttle = 1000;
-int autoDescent = 0;
-//#ifndef AeroQuad_v18
+
 int minThrottleAdjust = -50;
 int maxThrottleAdjust = 50;
 float holdAltitude = 0.0;
@@ -181,7 +188,6 @@ int holdThrottle = 1000;
 float zDampening = 0.0;
 byte storeAltitude = OFF;
 byte altitudeHold = OFF;
-//#endif
 
 // Receiver variables
 #define TIMEOUT 25000
@@ -225,7 +231,7 @@ byte update = 0;
 #define ALTITUDELOOPTIME 50000   // 50ms x 2, 10Hz (alternates between temperature and pressure measurements)
 #define BATTERYLOOPTIME 100000   // 100ms, 10Hz
 #define CAMERALOOPTIME 20000     // 20ms, 50Hz
-#define FASTTELEMETRYTIME 10000  // 10ms, 100Hz
+#define FASTTELEMETRYTIME 15000  // 15ms, 67Hz
 #define TELEMETRYLOOPTIME 100000 // 100ms, 10Hz for slower computers/cables (more rough Configurator values)
 
 float G_Dt = 0.002;
@@ -354,10 +360,12 @@ void processFlightControlXMode(void); // defined in FlightControl.pde
 void processFlightControlPlusMode(void); // defined in FlightControl.pde
 void processArdupirateSuperStableMode(void);  // defined in FlightControl.pde
 void processAeroQuadStableMode(void);  // defined in FlightControl.pde
+void processAttitudeMode(void); // defined in FlightControl.pde
 void readSerialCommand(void);  //defined in SerialCom.pde
 void sendSerialTelemetry(void); // defined in SerialCom.pde
 void printInt(int data); // defined in SerialCom.pde
 float readFloatSerial(void); // defined in SerialCom.pde
+void sendBinaryFloat(float); // defined in SerialCom.pde
 void comma(void); // defined in SerialCom.pde
 
 #if defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)

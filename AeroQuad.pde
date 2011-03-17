@@ -1,5 +1,5 @@
 /*
-  AeroQuad v2.3 - Feburary 2011
+  AeroQuad v2.3 - March 2011
   www.AeroQuad.com
   Copyright (c) 2011 Ted Carancho.  All rights reserved.
   An Open Source Arduino based multicopter.
@@ -52,11 +52,16 @@
 // Optional Sensors
 // Warning:  If you enable HeadingHold or AltitudeHold and do not have the correct sensors connected, the flight software may hang
 // *******************************************************************************************************************************
-#define UseArduPirateSuperStable // Enable the imported stable mode imported from ArduPirate (experimental, use at your own risk)
+// You must define one of the next 3 attitude stabilization modes or the software will not build
+// *******************************************************************************************************************************
+//#define UseArduPirateSuperStable // Enable the imported stable mode imported from ArduPirate (experimental, use at your own risk)
+#define UseAQStable // Enable the older (pre 2.3) AeroQuad Stable mode
+//#define UseAttitudeHold // Enable the new for 2.3 Attitude hold mode
 #define HeadingMagHold // Enables HMC5843 Magnetometer, gets automatically selected if CHR6DM is defined
 #define AltitudeHold // Enables BMP085 Barometer (experimental, use at your own risk)
 #define BattMonitor //define your personal specs in BatteryMonitor.h! Full documentation with schematic there
 //#define WirelessTelemetry  // Enables Wireless telemetry on Serial3  // Wireless telemetry enable
+#define BinaryWrite // Enables fast binary transfer of flight data to Configurator
 
 // *******************************************************************************************************************************
 // Camera Stabilization
@@ -290,9 +295,13 @@
   void (*processFlightControl)() = &processFlightControlPlusMode;
 #endif
 
-#ifdef UseArduPirateSuperStable
+#if defined(UseArduPirateSuperStable)
   void (*processStableMode)() = &processArdupirateSuperStableMode;
-#else
+#endif
+#if defined(UseAttitudeHold)
+  void (*processStableMode)() = &processAttitudeMode;
+#endif
+#if defined(UseAQStable)
   void (*processStableMode)() = &processAeroQuadStableMode;
 #endif
 
@@ -319,9 +328,17 @@ void setup() {
   #endif
   #ifdef AeroQuadMega_v2
     // pins set to INPUT for camera stabilization so won't interfere with new camera class
-    pinMode(33, INPUT);
-    pinMode(34, INPUT);
-    pinMode(35, INPUT);
+    pinMode(33, INPUT); // disable SERVO 1, jumper D12 for roll
+    pinMode(34, INPUT); // disable SERVO 2, jumper D11 for pitch
+    pinMode(35, INPUT); // disable SERVO 3, jumper D13 for yaw
+    pinMode(43, OUTPUT); // LED 1
+    pinMode(44, OUTPUT); // LED 2
+    pinMode(45, OUTPUT); // LED 3
+    pinMode(46, OUTPUT); // LED 4
+    digitalWrite(43, HIGH); // LED 1 on
+    digitalWrite(44, HIGH); // LED 2 on
+    digitalWrite(45, HIGH); // LED 3 on
+    digitalWrite(46, HIGH); // LED 4 on  
   #endif
   #if defined(APM_OP_CHR6DM) || defined(ArduCopter) 
     pinMode(LED_Red, OUTPUT);
@@ -353,19 +370,15 @@ void setup() {
   gyro.initialize(); // defined in Gyro.h
   accel.initialize(); // defined in Accel.h
   
+  #ifdef AeroQuad_v1_IDG
+    gyro.invert(YAW);
+  #endif
+
   // Calibrate sensors
   gyro.autoZero(); // defined in Gyro.h
   zeroIntegralError();
   levelAdjust[ROLL] = 0;
   levelAdjust[PITCH] = 0;
-  
-  // Setup correct sensor orientation
-  #ifdef AeroQuad_v1
-    gyro.invert(YAW);
-  #endif
-  //#if defined(AeroQuad_Wii) || defined(AeroQuadMega_Wii)
-  //  accel.invert(XAXIS);
-  //#endif
   
   // Flight angle estimation
   #ifdef HeadingMagHold
@@ -437,6 +450,34 @@ void loop () {
     sendSerialTelemetry(); // defined in SerialCom.pde
     telemetryTime = currentTime + TELEMETRYLOOPTIME;
   }
+  
+  #ifdef BinaryWrite
+    // **************************************************************
+    // ***************** Fast Transfer Of Sensor Data ***************
+    // **************************************************************
+    // AeroQuad.h defines the output rate to be 10ms
+    // Since writing to UART is done by hardware, unable to measure data rate directly
+    // Through analysis:  115200 baud = 115200 bits/second = 14400 bytes/second
+    // If float = 4 bytes, then 3600 floats/second
+    // Experimentally found 15ms output rate produces no flight jitter.
+    // If 15 ms output rate, then 54 floats/15ms
+    // Number of floats written using sendBinaryFloat is 15
+    if ((fastTransfer == ON) && (currentTime > (fastTelemetryTime + FASTTELEMETRYTIME))) {
+      printInt(21845); // Start word of 0x5555
+      for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(gyro.getData(axis));
+      for (byte axis = XAXIS; axis < LASTAXIS; axis++) sendBinaryFloat(accel.getData(axis));
+      for (byte axis = ROLL; axis < LASTAXIS; axis++)
+      #ifdef HeadingMagHold
+        sendBinaryFloat(compass.getRawData(axis));
+      #else
+        sendBinaryFloat(0);
+      #endif
+      for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle->getGyroUnbias(axis));
+      for (byte axis = ROLL; axis < LASTAXIS; axis++) sendBinaryFloat(flightAngle->getData(axis));
+      printInt(32767); // Stop word of 0x7FFF
+      fastTelemetryTime = currentTime;
+    }
+  #endif
 
   #ifdef CameraControl // Experimental, not fully implemented yet
     if ((cameraLoop == ON) && (currentTime > cameraTime)) { // 50Hz

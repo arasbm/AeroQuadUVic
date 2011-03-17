@@ -1,5 +1,5 @@
 /*
-  AeroQuad v2.3 - Feburary 2011
+  AeroQuad v2.3 - March 2011
   www.AeroQuad.com
   Copyright (c) 2011 Ted Carancho.  All rights reserved.
   An Open Source Arduino based multicopter.
@@ -135,8 +135,11 @@ void readSerialCommand() {
       for (byte motor = FRONT; motor < LASTMOTOR; motor++)
         motors.setRemoteCommand(motor, readFloatSerial());
       break;
-    case 'a':
-      // spare
+    case 'a': // fast telemetry transfer
+      if (readFloatSerial() == 1.0)
+        fastTransfer = ON;
+      else
+        fastTransfer = OFF;
       break;
     case 'b': // calibrate gyros
       gyro.calibrate();
@@ -221,10 +224,11 @@ void sendSerialTelemetry() {
   update = 0;
   switch (queryType) {
   case '=': // Reserved debug command to view any variable from Serial Monitor
-    PrintValueComma(degrees(flightAngle->getHeading()));
-    PrintValueComma(flightAngle->getData(YAW));
-    Serial.print(degrees(flightAngle->getData(YAW)));
-    Serial.println();
+    //PrintValueComma(degrees(flightAngle->getHeading()));
+    //PrintValueComma(rollPidUpdate);
+    //PrintValueComma(commandedYaw);
+    //Serial.print(degrees(flightAngle->getData(YAW)));
+    //Serial.println();
     //printFreeMemory();
     //queryType = 'X';
     break;
@@ -312,7 +316,7 @@ void sendSerialTelemetry() {
     PrintValueComma(degrees(flightAngle->getData(PITCH)));
     #if defined(HeadingMagHold) || defined(AeroQuadMega_CHR6DM) || defined(APM_OP_CHR6DM)
       //PrintValueComma(compass.getAbsoluteHeading());
-      PrintValueComma(degrees(flightAngle->getHeading()));
+      PrintValueComma(flightAngle->getDegreesHeading(YAW));
     #else
       PrintValueComma(0);
     #endif
@@ -342,7 +346,10 @@ void sendSerialTelemetry() {
   case 'S': // Send all flight data
     PrintValueComma(deltaTime);
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
-      PrintValueComma(gyro.getFlightData(axis));
+      if (axis == PITCH)
+        PrintValueComma(-gyro.getFlightData(axis));
+      else
+        PrintValueComma(gyro.getFlightData(axis));
     }
     #ifdef BattMonitor
       PrintValueComma(batteryMonitor.getData());
@@ -356,8 +363,13 @@ void sendSerialTelemetry() {
       PrintValueComma(motors.getMotorCommand(motor));
     }
     for (byte axis = ROLL; axis < LASTAXIS; axis++) {
-      PrintValueComma(accel.getFlightData(axis));
-    }
+      if (axis == ROLL)
+        PrintValueComma(accel.getFlightData(YAXIS));
+      else if (axis == PITCH)
+        PrintValueComma(accel.getFlightData(XAXIS));
+      else
+        PrintValueComma(accel.getFlightData(ZAXIS));
+    }  
     Serial.print(armed, BIN);
     comma();
     if (flightMode == STABLE)
@@ -366,7 +378,7 @@ void sendSerialTelemetry() {
       PrintValueComma(1000);
     #ifdef HeadingMagHold
       //PrintValueComma(compass.getAbsoluteHeading());
-      PrintValueComma(degrees(flightAngle->getHeading()));
+      PrintValueComma(flightAngle->getDegreesHeading(YAW));
     #else
       PrintValueComma(0);
     #endif
@@ -409,7 +421,13 @@ void sendSerialTelemetry() {
     PrintValueComma(receiver.getData(YAW));
     PrintValueComma(headingHold);
     PrintValueComma(setHeading);
-    Serial.println(relativeHeading);
+    // AKA - Configurator wants -180/180 for headings,
+    // when heading hold active, the relative heading can be > 180 due to the way it's calculated
+    // this corrects it just for the configurator.
+    if ((setHeading + relativeHeading) > 180)
+      Serial.println(-360 + relativeHeading);
+    else
+      Serial.println(relativeHeading);
     break;
   case '6': // Report remote commands
     for (byte motor = FRONT; motor < LEFT; motor++) {
@@ -477,38 +495,21 @@ void sendSerialTelemetry() {
     break;
   case '`': // Send Camera values 
     #ifdef Camera
-    //Serial.print(camera.getMode());
-    //comma();
     PrintValueComma(camera.getMode());
-    //Serial.print(camera.getCenterPitch());
-    //comma();
     PrintValueComma(camera.getCenterPitch());
-    //Serial.print(camera.getCenterRoll());
-    //comma();
     PrintValueComma(camera.getCenterRoll());
-    //Serial.print(camera.getCenterYaw());
-    //comma();
     PrintValueComma(camera.getCenterYaw());
+
     Serial.print(camera.getmCameraPitch() , 2);
     comma();
     Serial.print(camera.getmCameraRoll() , 2);
     comma();
     Serial.print(camera.getmCameraYaw() , 2);
     comma();
-    //Serial.print(camera.getServoMinPitch());
-    //comma();
     PrintValueComma(camera.getServoMinPitch());
-    //Serial.print(camera.getServoMinRoll());
-    //comma();
     PrintValueComma(camera.getServoMinRoll());
-    //Serial.print(camera.getServoMinYaw());
-    //comma();
     PrintValueComma(camera.getServoMinYaw());
-    //Serial.print(camera.getServoMaxPitch());
-    //comma();
     PrintValueComma(camera.getServoMaxPitch());
-    //Serial.print(camera.getServoMaxRoll());
-    //comma();
     PrintValueComma(camera.getServoMaxRoll());
     Serial.println(camera.getServoMaxYaw());
     #endif
@@ -553,3 +554,15 @@ void printInt(int data) {
   Serial.print(lsb, BYTE);
 }
 
+void sendBinaryFloat(float data) {
+  union binaryFloatType {
+    byte floatByte[4];
+    float floatVal;
+  } binaryFloat;
+  
+  binaryFloat.floatVal = data;
+  Serial.print(binaryFloat.floatByte[3], BYTE);
+  Serial.print(binaryFloat.floatByte[2], BYTE);
+  Serial.print(binaryFloat.floatByte[1], BYTE);
+  Serial.print(binaryFloat.floatByte[0], BYTE);
+}
