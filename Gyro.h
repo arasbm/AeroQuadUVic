@@ -45,8 +45,8 @@ public:
   //int zeroGyroYawCount;
     
   Gyro(void){
-    sign[ROLL] = 1;
-    sign[PITCH] = 1;
+    sign[ROLL] = -1;
+    sign[PITCH] = -1;
     sign[YAW] = 1;
   }
   
@@ -252,7 +252,7 @@ public:
     gyroLastADC = 0;  // initalize for rawHeading, may be able to be removed in the future
     
     // Check if gyro is connected
-    if (readWhoI2C(gyroAddress) != gyroAddress)
+    if (readWhoI2C(gyroAddress) != 0x69)
       Serial.println("Gyro not found!");
         
     // Thanks to SwiftingSpeed for updates on these settings

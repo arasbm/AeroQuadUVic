@@ -78,7 +78,8 @@ void readPilotCommands() {
   }
   
   // Check Mode switch for Acro or Stable
-  if (receiver.getRaw(MODE) > 1500) {
+ // if (receiver.getRaw(MODE) > 1500) {
+   if (1) { // 1=stable, 0 = acro
     #if defined(AeroQuad_v18) || defined(AeroQuadMega_v2)
       if (flightMode == ACRO)
         digitalWrite(LED2PIN, HIGH);
