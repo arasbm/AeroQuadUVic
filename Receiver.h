@@ -359,7 +359,7 @@ SIGNAL(PCINT2_vect) {
   static byte receiverPin[6] = {5, 3, 2, 4, 1, 0}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
 #else
  //arduino pins 63, 64, 65, 62, 66, 67
-  static byte receiverPin[6] = {1, 2, 3, 0, 4, 5}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
+  static byte receiverPin[6] = {0, 1, 3, 2, 4, 5}; // bit number of PORTK used for ROLL, PITCH, YAW, THROTTLE, MODE, AUX
 #endif
 
 class Receiver_AeroQuadMega : public Receiver {

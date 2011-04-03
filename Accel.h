@@ -18,6 +18,8 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#include "ADXL345.h"
+
 class Accel {
 public:
   float accelScaleFactor;
@@ -182,11 +184,12 @@ public:
 class Accel_AeroQuadMega_v2 : public Accel {
 private:
   int accelAddress;
+  ADXL345 ADXL;
   
 public:
   Accel_AeroQuadMega_v2() : Accel(){
-    accelAddress = 0x40; // page 54 and 61 of datasheet
-    accelScaleFactor = G_2_MPS2(1.0/4096.0);  //  g per LSB @ +/- 2g range
+    //accelAddress = 0x40; // page 54 and 61 of datasheet
+    accelScaleFactor = G_2_MPS2(.0039);  //  g per LSB @ +/- 2g range
   }
   
   void initialize(void) {
@@ -194,6 +197,14 @@ public:
     
     this->_initialize(0,1,2);  // AKA added for consistency
   
+	ADXL.powerOn();
+    ADXL.setLowPower(false);
+    Serial.println("Here");
+    ADXL.set_bw(ADXL345_BW_25);
+    Serial.print("BW_OK? ");
+    Serial.println(ADXL.status, DEC);
+    ADXL.setRangeSetting(2);
+
     accelOneG        = readFloat(ACCEL1G_ADR);
     accelZero[XAXIS] = readFloat(LEVELPITCHCAL_ADR);
     accelZero[YAXIS] = readFloat(LEVELROLLCAL_ADR);
@@ -201,21 +212,21 @@ public:
     smoothFactor     = readFloat(ACCSMOOTH_ADR);
     
     // Check if accel is connected
-    if (readWhoI2C(accelAddress) != 0x03) // page 52 of datasheet
-      Serial.println("Accelerometer not found!");
+   // if (readWhoI2C(accelAddress) != 0x03) // page 52 of datasheet
+   //   Serial.println("Accelerometer not found!");
 
     // Thanks to SwiftingSpeed for updates on these settings
     // http://aeroquad.com/showthread.php?991-AeroQuad-Flight-Software-v2.0&p=11207&viewfull=1#post11207
-    updateRegisterI2C(accelAddress, 0x10, 0xB6); //reset device
-    delay(10);  //sleep 10 ms after reset (page 25)
+    //updateRegisterI2C(accelAddress, 0x10, 0xB6); //reset device
+    //delay(10);  //sleep 10 ms after reset (page 25)
 
     // In datasheet, summary register map is page 21
     // Low pass filter settings is page 27
     // Range settings is page 28
-    updateRegisterI2C(accelAddress, 0x0D, 0x10); //enable writing to control registers
-    sendByteI2C(accelAddress, 0x20); // register bw_tcs (bits 4-7)
-    data = readByteI2C(accelAddress); // get current register value
-    updateRegisterI2C(accelAddress, 0x20, data & 0x0F); // set low pass filter to 10Hz (value = 0000xxxx)
+    //updateRegisterI2C(accelAddress, 0x0D, 0x10); //enable writing to control registers
+    //sendByteI2C(accelAddress, 0x20); // register bw_tcs (bits 4-7)
+    //data = readByteI2C(accelAddress); // get current register value
+    //updateRegisterI2C(accelAddress, 0x20, data & 0x0F); // set low pass filter to 10Hz (value = 0000xxxx)
 
     // From page 27 of BMA180 Datasheet
     //  1.0g = 0.13 mg/LSB
@@ -225,17 +236,32 @@ public:
     //  4.0g = 0.50 mg/LSB
     //  8.0g = 0.99 mg/LSB
     // 16.0g = 1.98 mg/LSB
-    sendByteI2C(accelAddress, 0x35); // register offset_lsb1 (bits 1-3)
-    data = readByteI2C(accelAddress);
-    data &= 0xF1;
-    data |= 0x04; // Set range select bits for +/-2g
-    updateRegisterI2C(accelAddress, 0x35, data);
+    //sendByteI2C(accelAddress, 0x35); // register offset_lsb1 (bits 1-3)
+    //data = readByteI2C(accelAddress);
+    //data &= 0xF1;
+    //data |= 0x04; // Set range select bits for +/-2g
+    //updateRegisterI2C(accelAddress, 0x35, data);
   }
   
   void measure(void) {
-    //int rawData[3];
+    int rawData[3];
+	ADXL.readAccel(rawdata);
 
-    Wire.beginTransmission(accelAddress);
+      accelADC[XAXIS]  = accelZero[XAXIS] - rawdata[XAXIS];
+          //Serial.print("accelADC     ");
+          //Serial.println(accelADC[XAXIS], DEC);
+      accelData[XAXIS] = filterSmooth(accelADC[XAXIS] * accelScaleFactor, accelData[XAXIS], smoothFactor);
+          //Serial.println(accelData[XAXIS], DEC);
+      accelADC[YAXIS] = accelZero[YAXIS] - rawdata[YAXIS];
+          //Serial.println(accelADC[YAXIS], DEC);
+          //Serial.print("    ");
+      accelData[YAXIS] = filterSmooth(accelADC[YAXIS] * accelScaleFactor, accelData[YAXIS], smoothFactor);
+          //Serial.println(accelData[YAXIS], DEC);
+      accelADC[ZAXIS] = accelZero[ZAXIS] - rawdata[ZAXIS];
+      accelData[ZAXIS] = filterSmooth(accelADC[ZAXIS] * accelScaleFactor, accelData[ZAXIS], smoothFactor);
+
+
+ /*   Wire.beginTransmission(accelAddress);
     Wire.send(0x02);
     Wire.endTransmission();
     Wire.requestFrom(accelAddress, 6);
@@ -245,7 +271,8 @@ public:
       else
         accelADC[axis] = accelZero[axis] - ((Wire.receive()|(Wire.receive() << 8)) >> 2);
       accelData[axis] = filterSmooth(accelADC[axis] * accelScaleFactor, accelData[axis], smoothFactor);
-    }
+    } */
+
   }
 
   const int getFlightData(byte axis) {
@@ -256,15 +283,18 @@ public:
   void calibrate(void) {  
     int findZero[FINDZERO];
     int dataAddress;
+	int rawdata[3];
     
     for (byte calAxis = XAXIS; calAxis < ZAXIS; calAxis++) {
       if (calAxis == XAXIS) dataAddress = 0x02;
       if (calAxis == YAXIS) dataAddress = 0x04;
       if (calAxis == ZAXIS) dataAddress = 0x06;
       for (int i=0; i<FINDZERO; i++) {
-        sendByteI2C(accelAddress, dataAddress);
-        findZero[i] = readReverseWordI2C(accelAddress) >> 2; // last two bits are not part of measurement
-        delay(10);
+        //sendByteI2C(accelAddress, dataAddress);
+        //findZero[i] = readReverseWordI2C(accelAddress) >> 2; // last two bits are not part of measurement
+        ADXL.readAccel(rawdata);
+        findZero[i] = rawdata[calAxis];
+		delay(10);
       }
       accelZero[calAxis] = findMedian(findZero, FINDZERO);
     }
