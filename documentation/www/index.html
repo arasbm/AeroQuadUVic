@@ -98,61 +98,82 @@
 			The weight used was approximately the diameter of the arduino board, so airflow characteristics should be comparable to those during flight. 
 			The initial weight of the airframe, motors, arduino, ESCs, battery monitor, plus the weight, was 1763g. 
 			This was well above what the motors could be expected to lift, so the total lift was calculated as the difference between initial weight (with the motors stopped) and final weight (with the motors at full power.) 
+            </p>
 			Here is a video demonstrating a test using this technique:
 			<br />
 			<iframe title="Testing the lift force" width="425" height="349" src="http://www.youtube.com/embed/ZpDpEkwurGo" frameborder="0" allowfullscreen></iframe>
+            <br />
+            <br />
+<p>
 		Initial weight at 4.5x4.5E 1763g final weight 1400g
-		<br />
 		for a total thrust of 363g. This quickly falls off as the battery drains, so subsequent tests are to be completed only on a fully charged battery.
 		<br />
 		For additional test propellers, in most cases there is only a single propeller available. 
 		It is not feasible to run only one motor, because the tether to the weight is fixed and a single motor does not provide lift as much as it simply changes the balance and threatens to topple the weight. 
 		To address this, additional propeller tests are accomplished by means of running two opposing motors, but with only one new propeller attached. 
 		Since the difference in thrust of a propeller change will be a fractional proportion of the total lift, the lowest final weight will be presumed to be the propeller with most lift.
-		<br />
 		First, the original 4.5x4.5E propellers are run in this configuration.
 		<!--TODO: add a picture of this props -->
 		Initial weight at 4.5x4.5E 1763g final weight, two motors 1547g thrust = 216g
-		
+</p>
+<p>		
 		Next, one of the propeller was replaced with a 8x4.5E two bladed propeller.
+        <br />
+        <br />
 		
 		    * PROBLEM* one of the 8x4.5 props is contra-rotating! It pushes down. Had to try the other prop. 
-		
+		<br />
+        <br />
 		Initial weight 1765g final weight 1532g thrust = 233g
 		<br />
+        <br />
 		Not that much benefit and we can't actually use 4 8 inch props on the current frame because they will interfere with each other.
 		<br />
+        <br />
 		Next, one propeller was replaced with a 3 bladed 5 inch with less pitch (labelled GWS EP-5030x3)
 		<br />
 		initial weight 1762g final weight 1515g thrust = 247g
 		<br />
+        <br />
 		Next the orange 6 inch propeller was run (GWS EP-6030)
 		initial weight 1766g final weight 1530g thrust = 236g
 		Of course, there is a confound between prop size and pitch. 
 		It is unknown what a 4.5 pitch 6 inch prop would do, and since the specification cannot be trusted, it is unclear which is preferred by this motor.
 		<br />
+        <br />
 		Finally, the GWS EP-4025 was run.
-		
+		<br />
 		Initial weight 1765g final weight 1536g thrust = 229g
 		<br />
 		The 5 inch 3-blade propeller seems to be the best performer for the size. The shallower pitch also seems to be an advantage. 
 		It is possible that these motors simply do not have sufficient torque to drive a higher pitch propeller.
 		<br />
+        <br />
+        </P>
 		<h4>Final Configuration</h4> 
+        <p>
+        <br />
 		Four 3 bladed 5 inch props with a 3.0 inch pitch. Model GWS EP-5030x3
-		Initial weight 1758g final weight 1290g (first pulse, quickly drops to around 1370g sustained) thrust = 468g (peak) 388g (sustained)
-		The goal is to get to lift capability with a maximum of 90% of motor thrust for a sustained period so that the remaining 10% of capacity can be used for manoeuvring. 
+        <br />
+		Initial weight 1758g
+        <br />
+        final weight 1290g
+        <br />
+        (first pulse, quickly drops to around 1370g sustained)
+        <br />
+        thrust = 468g (peak) 388g (sustained)
+		<br />
+        The goal is to get to lift capability with a maximum of 90% of motor thrust for a sustained period so that the remaining 10% of capacity can be used for manoeuvring. 
 		This will be documented in the battery section.
 		<br />
 		</p>
 			<h3>Battery</h3>
 			<p>
-			A <i>Rhino 610mAh 3S 11.1v 20C Lipoly Pack</i> is used that was purchase from <a href="http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=7308">hobby king</a>. Below are the specifications of this battery:
-			<!--TODO: add table with battery specs -->
+			A <i>Rhino 610mAh 3S 11.1v 20C Lipoly Pack</i> is used that was purchased from <a href="http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=7308">hobby king</a>.
 
 			<br />
 			<h4>Battery Monitor</h4>
-		To monitor the state of battery during flight and avoid accident that may be caused by running out of battery in middle of a flight, a battery monitor is necessary. A <a href"http://www.hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=7223">Hobby King Battery Monitor 3S</a> is used for this purpose. The battery monitor lights blue when it recieved above 11,0V, at 10,0-11,0V it blinks blue, under 10,0V it lights red, and when below 9,8V it beeps and blinks red.
+		To monitor the state of battery during flight and avoid accidents that may be caused by running out of battery in the middle of a flight (as well as battery damage due to overdischarge), a battery monitor is necessary. A <a href="http://www.hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=7223">Hobby King Battery Monitor 3S</a> is used for this purpose. The battery monitor lights blue when it recieved above 11,0V, at 10,0-11,0V it blinks blue, under 10,0V it lights red, and when below 9,8V it beeps and blinks red.
 		<br />
 		<br />
 		<h4>Running Time</h4>
@@ -168,12 +189,14 @@ A <a href="http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=7386">
 This is an advanced charger that is capable of charging, discharging, and balancing several different types of batteries.
 The charger require an input voltage of 10~18v. In this project, recharge is accomplished through the use of a PC power supply. 
 A small wire shorting the green and black pins on the ATX connector are used to allow it to provide a 12V source to the GT Power A6-10 battery charger. 
-<br /><img src="" alt="TODO: Figure showing the configuration of battery charging station" >
+<br /><img src="http://static.rcgroups.net/forums/attachments/2/1/9/8/6/6/a2073412-67-IMG_3511%20%28Large%29.jpg?d=1221909863" width="300" height="300" border="20" alt="charger setup" >
 <br />
 It would be possible to charge the batteries at a higher rate, supposedly they can take up to 5x their discharge rate. 
-For anything over 2 times their discharge rate, though, <!-- TODO: reference this website --> one website was recommending to charge them in a ceramic mug because they have a tendency to explode. 
+For anything over 2 times their discharge rate, though, one website was recommending to charge them in a ceramic mug because they have a tendency to explode. (See <a href="http://www.youtube.com/watch?v=z3o_2mwRPdw">here</a> for an example.)
 Given this advice, a maximum charge rate of 2 times the discharge current was set.
 <br />
+<br />
+One other situation was encountered with respect to battery charging. The LIPO charge has a balance plug, so on the 3 cell LIPO used, the charger is aware of the voltage on each cell during charging. On one occasion, the battery was left on the quad overnight and the battery monitor and Arduino caused it to be completely discharged. This caused the normal LIPO charging function of the charger to fail with one cell at 0V. A solution to this was to *CAREFULLY* set the LIPO battery on a NIMH charge cycle without the balancing cable attached. This was at 0.5 amps and the voltage was never allowed to go above 9V (on our 11.1 Volt battery.) After approximately 5 minutes on this uncontrolled charge cycle the battery was able to take a full charge on the regular LIPO program. This had to be done one other time after discharge even though the battery was never fully drained again leading to a suspicion that some degree of damage occured to that cell.
 </p>
 <h3>Frame</h3>
 <h4>Aluminium Cross Frame</h4>
@@ -253,15 +276,25 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
 			<br />			
 			<object width="424" height="269"><param name="movie" value="http://www.youtube.com/v/ObHW-6utU3E?fs=1&amp;hl=en_US&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/ObHW-6utU3E?fs=1&amp;hl=en_US&amp;rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="424" height="269"></embed></object>
 			<br />
+            <br />
+            There were some problems with the sensors. The primary one is that although the Arduino must be the largest market for this sensor, the vendor saw fit to release it with I2C pins that did not match the order on the Arduino. This necessited the creation of small jumper wires to reverse the SDA and SCL pins which had the effect of slightly skewing the sensor from the planned square alignment to the Arduino. This had later ramifications in terms of the ability to cleanly separate the channels of sensor data.
+
+            In addition, the stability of the magnetometer was not ideal. Until code was in place to correct it's drift by means of the accelerometers it was not really usable.
 			</p>
 			
 			<h3>Wireless Communication</h3>
-			<p>For wireless communication with the quadcopter, a pair of XBee Modules and <i>Arduino XBee Shield</i> are used. 
+            <p>Insert description and images of wireless controller here
+            </p>
+
+			<p>For wireless communication with the quadcopter, a pair of XBee Modules and <i>Arduino XBee Shield</i> were also explored. 
 			The serial connection between the modules can be tested with a blinking LED light. 
 			The following video which is based on <a href="http://arduino.cc/en/Guide/ArduinoXbeeShield">this arduino xbee shield tutorial</a>, demonstrates the plug and play functionality of this modules.
 			<br />		
 			<iframe title="XBee blinking LED test" width="425" height="349" src="http://www.youtube.com/embed/rVwRllgzPls" frameborder="0" allowfullscreen></iframe>
 			</p>
+
+            <h3>Alternate control hardware</h3>
+            <p>In the first iteration of a control strategy, a Wii Nunchuk controller was envisioned as the flight control. This controller, described <a href="http://www.arduino.cc/playground/Main/WiiChuckClass">here</a>, has a 4 way rocker on top and two buttons on the front, as well as 3 degrees of accelerometer. It was planned that the buttons would chord to allow up, down, stop, and start to be conveyed while the rocker would be used for directional control. In a complete and tested system with all stable modes working properly this could be feasible, but it getting to that point this was not nearly enough channels of input to fly the quadcopter. It was an interesting experiment, however, and hooking up the Nunchuk was quite straightforward as the Wii uses I2C for it's controllers!</p>
 
 </article>
 					
