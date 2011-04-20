@@ -54,7 +54,7 @@
 			<article>
 			<h2><a href="#">Hardware</a></h2>
 			<h3>Controller</h3>
-			<p>Arduino platform is selected for this project, mainly due to its open software and hardware nature which has resulted in availability of extensive technical information. As a result there are many tutorials and example project available for this platform. A list of arduino boards can be found <a href="http://arduino.cc/en/Main/Boards">here</a>. Many of these boards including <i>Arduino Uno</i> and <i>Arduino Mega</i> are perfectly capable of flying a quad copter. In this project, the Arduino compatible <a href="http://www.seeedstudio.com/depot/seeeduino-v221-atmega-328p-p-669.html?cPath=80&zenid=ddc5e83a38550b702d7aeebbb94512a5">Seeeduino</a> board is used; specifically, <i>Seeeduino Mega v1.1</i> mainly since it was available at hand.</p>
+			<p>The Arduino platform is selected for this project, mainly due to its open software and hardware nature which has resulted in availability of extensive technical information. As a result there are many tutorials and example project available for this platform. A list of arduino boards can be found <a href="http://arduino.cc/en/Main/Boards">here</a>. Many of these boards including <i>Arduino Uno</i> and <i>Arduino Mega</i> are perfectly capable of flying a quad copter. In this project, the Arduino compatible <a href="http://www.seeedstudio.com/depot/seeeduino-v221-atmega-328p-p-669.html?cPath=80&zenid=ddc5e83a38550b702d7aeebbb94512a5">Seeeduino</a> board is used; specifically, <i>Seeeduino Mega v1.1</i> mainly since it was available at hand. This was an intentional design constraint based on the purpose of this project as a test run for a future class offering of the mechatronics class - to use a different controller would obsolete much of the hardware available for the class.</p>
 
 			<h3>Schematic</h3>
 			<img src="img/" alt="Schematic showing all electronic components of the system and how they are connected. " class="alignleft" />
@@ -64,13 +64,14 @@
 			<p>
 			Many electric devices such as blow dryer and CPU fan use brushed direct current (DC) motors. 
 			They are called brushed since they use a carbon brush to keep the current flowing into the rotating section (called shaft or rotor) inside the motor. 
-			We use four brushless DC motors, specifically this motor. 
-			Brushless motors are suitable for this project since they deliver much higher revolutions per minute (RPM). 
+			We use four brushless DC motors, specifically this motor. <a href="http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=5358">10g brushless</a>
+			Brushless motors are more suitable for this project since they deliver much higher revolutions per minute (RPM). 
 			Since they dont use brush to deliver current to the shaft, there is much less friction; therefore, they are much more efficient and can produce more torque. 
+            There is some variation between motors, following some advice on the internet we ordered an extra one and were glad we did. The speed variation was annoying, but the benefit really came out in one of the crashes!
 			</p>
 
 			<h3>Electronic Speed Controller (ESC)</h3>
-			<p>Four <i>plush 6amp brushless speed controllers </i> (Plush 6A) are used in this project.
+			<p>Four <i>Turnigy plush 6amp brushless speed controllers </i> (Plush 6A) are used in this project. <a href="http://hobbyking.com/hobbyking/store/uh_viewItem.asp?idProduct=4318">Plush 6A</a>
 			<h4>Direction of rotation</h4>
 			The three wires from brushless motor can be connected to the three output wires of the speed controller in any order. 
 			However, reversing the direction of rotation of the motor is done by <strong>switching any two of these three wires</strong>. 
