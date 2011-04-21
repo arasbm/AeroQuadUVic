@@ -325,13 +325,33 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
             The flight controls must also be calibrated. During the previous section the receiver pin assignments were derived from this calibration, but in fact the calibration itself must be performed on a regular basis. Each flight controller has somewhat different characteristics in terms of the maximum and minimum values that it sends, and these appear to be somewhat effected by local conditions as well, so it is useful to calibrate frequently. This just involves turning off the motor power and moving each control stick to the extent of it's travel in each direction.
             <br /><br />
             The electronic speed controllers must also be calibrated. This allows them to adjust for the minimum and maximum levels to be sent to each motor. This was slightly problematic in our case with the one motor running consistently slower than the others. Calibrating the ESCs helped adjust for this but did not entirely resolve the problem. Calibration of the ESCs requires a carefully timed power off of the entire board and then a re-initialization into a calibration mode. Repeatable with some practice, but initially the ESCs could not be calibrated due to an inability to properly follow the directions to remove power.
+            <br /><br />
+            <a href="http://aeroquad.com/content.php?118">Here</a> is a checklist of final things to test before moving on to PID tuning and flight.
+            
             </p>
 
+            <h3> PID tuning</h3>
+            <p>
+            Tuning of the controller must be done for each individual quad. The specifics of motor speed and size, frame material and balance, and other aspects of the construction mean that a proper PID tuning for one craft will likely not apply to one even slightly different. The tuning process is easiest to explain (and perform!) in the acrobatic mode. The document <a href="http://aeroquad.com/content.php?126-PID-Tuning-Your-AeroQuad">here</a> goes through a good description of the process. Basically, the terms that control how strongly the motors adjust for a change in orientation away from level are moved upwards until the craft strongly resists these changes. At this point, there is likely some significant oscillation going on, so the term that controls the decay of the response is adjusted until the oscillation goes away. Then the same is done for the other axis. This is all most easily accomplished when the craft is stably held in one hand and the other is used to adjust values. Watch out for the propellers!
+            <br /><br />
+            Moving on to the stable mode PID tuning is more challenging and is best addressed in the document above.
+            </p>
 
-
-
-
-			</article>
+            <h3>Stability modes</h3>
+            <p>
+            A good block diagram of the control strategies in the various stability modes can be found <a href="http://aeroquad.com/showwiki.php?title=Control+System+Block+Diagrams">here</a>
+            <br /><br />
+            Most of the experimentation that was done on this quad was in acrobatic mode. The stable mode was never entirely effective, probably due to problems in properly tuning it (and perhaps the aforementioned sensor alignment issue.)
+            <br /><br />
+            The control strategies for the more complex stability modes are quite interesting. Although not much use was made of them in this project, they are a definite point of future exploration. The strategy that is overtaking all others not just in the AeroQuad project but the other quad designs is a Directional Cosine Matrix (DCM) control strategy. It is beautifully outlined <a href="
+http://gentlenav.googlecode.com/files/DCMDraft2.pdf">here</a>. This strategy is not quite as effective as Kalman filters, but is much less computationally intensive. A good discussion of the two approaches can be found <a href="http://aeroquad.com/showthread.php?2293-Gyro-drift-compensation">here</a>
+            </p>
+			
+            <h3>Future Directions</h3>
+            <p>
+            There are very many future directions that this work could take. First, of course, is getting accurate control and tuning of the stability modes. Including the addition of a barometer for altitude heading. Some quads have become very advanced with GPS and onboard vision systems, these approaches generally require more processor resources than could be acommodated by the Mega1280 used in this project, but are potentially interesting avenues to explore in the far future. Seeing the fruition of the Wii nunchuk flight controller strategy on a well-tuned quad would be an exciting first step to a remote controlled camera platform that would be great to experiment with. Having seen the indoor flight arena at ETH Zurich (see <a href="http://www.youtube.com/watch?v=3CR5y8qZf0Y">here</a>) the fifth and sixth floor atrium areas now covered by paper airplanes could form a fantastic display of autonomous quads that would be both a mechatronics work area and a fantastic advertisement for UVic. 
+            </p>
+            </article>
 						
 			</section><!-- end of #content -->
 
