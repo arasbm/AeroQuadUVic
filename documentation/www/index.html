@@ -12,37 +12,38 @@
 
 	<nav><!-- top nav -->
 		<div class="menu">
+		<!--
 			<ul>
 				<li><a href="#">Home</a></li>
-				<li><a href="#">About</a></li>
-				<li><a href="#">Build Log</a></li>
-			</ul>
+			</ul>	-->
 		</div>
 	</nav><!-- end of top nav -->
 	
 	<header><!-- header -->
 		<div id="headerlogo"><img src="images/stirofoam_frame1_300x300.png" alt="" /></div>
 		<h1><a href="#">UVic Quadcopter</a></h1>
-		<h2>A pilot project for mechatronics course1 @UVic</h2>
+		<h2>A pilot project for mechatronics course @UVic</h2>
 	</header><!-- end of header -->
 	
 	<section id="main">
-		<aside id="sidebar1"><!-- sidebar1 -->
+	
+	<!-- sidebar1
+		<aside id="sidebar1">
 				<h3>Things To Do</h3>
 					<ul>
 						<li>add highlights and pictures on this side</li>
 						<br/>
-						<li>Figure out radio communication (Aras)</li>
-						<li>Figure out how to use 9D sensor (Derek)</li>
-						<li>Upload AQ Code</li>
 						<li></li>
 					</ul>
 
-		</aside><!-- end of sidebar1 -->
+		</aside>
+		 end of sidebar1 -->
 
 			<section id="content"><!-- #content -->
 			
 <article>
+<iframe title="quadcopter flight testing" width="560" height="349" src="http://www.youtube.com/embed/S8FQNDOTANM" frameborder="0" allowfullscreen></iframe>
+<br />
 <h1>Quadcopter Build Log</h1>
 			<p>This document captures all the relevant efforts that were made in construction of this quadcopter. The timeframe of the project is January 2011 to April2011. 
 
@@ -57,8 +58,8 @@
 			<p>The Arduino platform is selected for this project, mainly due to its open software and hardware nature which has resulted in availability of extensive technical information. As a result there are many tutorials and example project available for this platform. A list of arduino boards can be found <a href="http://arduino.cc/en/Main/Boards">here</a>. Many of these boards including <i>Arduino Uno</i> and <i>Arduino Mega</i> are perfectly capable of flying a quad copter. In this project, the Arduino compatible <a href="http://www.seeedstudio.com/depot/seeeduino-v221-atmega-328p-p-669.html?cPath=80&zenid=ddc5e83a38550b702d7aeebbb94512a5">Seeeduino</a> board is used; specifically, <i>Seeeduino Mega v1.1</i> mainly since it was available at hand. This was an intentional design constraint based on the purpose of this project as a test run for a future class offering of the mechatronics class - to use a different controller would obsolete much of the hardware available for the class.</p>
 
 			<h3>Schematic</h3>
-			<img src="img/" alt="Schematic showing all electronic components of the system and how they are connected. " class="alignleft" />
-			<p></p>
+			<a href="images/AeroQuadUVicWiring.png"><img src="images/AeroQuadUVicWiring_thumbnail.png" width="312" height="345" border="0" alt="Wiring Diagram of the electronic components of the quadcopter" class="aligncenter">
+			<center>Wiring diagram of the quadcopter</center></a>
 			<br />
 			<h3>Brushless Motor</h3>
 			<p>
@@ -283,7 +284,7 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
 			</p>
 			
 			<h3>Wireless Communication</h3>
-            <p>Insert description and images of wireless controller here
+            <p>
             </p>
 
 			<p>For wireless communication with the quadcopter, a pair of XBee Modules and <i>Arduino XBee Shield</i> were also explored. 
@@ -291,6 +292,7 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
 			The following video which is based on <a href="http://arduino.cc/en/Guide/ArduinoXbeeShield">this arduino xbee shield tutorial</a>, demonstrates the plug and play functionality of this modules.
 			<br />		
 			<iframe title="XBee blinking LED test" width="425" height="349" src="http://www.youtube.com/embed/rVwRllgzPls" frameborder="0" allowfullscreen></iframe>
+			<br />
 			</p>
 
             <h3>Alternate control hardware</h3>
@@ -300,12 +302,8 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
 					
 <article>
 <h2><a href="#">Software</a></h2>
-			<p></p>
-
 			<h3>Testing ESC and Brushless Motor</h3>
 			<p>The four brushless motors on the quadcopter are controlled via an electronic speed controller each. <a href="https://github.com/arasbm/AeroQuadUVic/blob/master/tests/test_four_esc_keyboard.pde">Here</a> is a minimal sketch that uses servo library to control four ESC and the motors connected to them using keyboard. The charachters pressed on the keyboard are passed to Arduino board on the quadcopter via a serial connection. The instruction on how to use this code are documented inside the sketch. </p>
-            <br />
-            <br />
             <br />
             <h3>Integrating into the AeroQuad environment</h3>
             <p>Although the initial integration involved quite a large number of changes, the AeroQuad code kept moving in ways that it was desirable to keep up with. For that reason, the initial strategy of declaring a UVic type and keeping all of our changes in that block was abandoned for the more straightforward approach of modifying one of their types. This allowed us to make only a few changes with each integration into one of their releases. In the end, to integrate into a new release took the following changes:
@@ -315,22 +313,20 @@ The video below shows testing the new frame with the 5 inch three blade props.<b
             <br /><br /> change gyro address to 0x68 and change return value for check (because the gyro was on the same I2C port as other devices the sparkfun board chose to put it on a different address
             <br /><br /> change receiver pin assigments (this differs by each receiver and seems arbitrary. The assignments were found by trial and error in configurator.)
             <br /><br /> change signs in accel and gyro (because the sensor board was mounted in a different orientation on the 9DOF board than on the shield that the AeroQuad software was designed for, this had to be adjusted.)
-            <br /><br />
-            <br /><br />
+            <br />
             </p>
             <h3>Calibrating the sensors and flight controls</h3>
-            <br /><br />
+            <br />
             <p>As shown in the configurator video above (in the sensors section), the sensors must be calibrated before flight. This allows them to determine where flat and level is and then changes to this during flight result in corrective changes from the motors. Please note that this does NOT correct for a skewed sensor install! This was a point of some pain during this project. Calibration of the gyro and accelerometer was quick and simple, just place the craft flat and press calibrate. Calibration of the magnetometer was a bit more involved because the magnetic field is subject to many non-linear disturbances which outweigh the effects of the earth's magnetic field. The magnetometer is put into calibration mode and the craft rotated through all axes to create a map of magnetometer readings. The software then takes that into account for calculating heading during flight. This does not, however, take into account local magnetic differences during flight - if the pilot were to fly near a large transformer for instance, the heading could be expected to deviate wildly.
-            <br /><br />
+            <br />
             The flight controls must also be calibrated. During the previous section the receiver pin assignments were derived from this calibration, but in fact the calibration itself must be performed on a regular basis. Each flight controller has somewhat different characteristics in terms of the maximum and minimum values that it sends, and these appear to be somewhat effected by local conditions as well, so it is useful to calibrate frequently. This just involves turning off the motor power and moving each control stick to the extent of it's travel in each direction.
-            <br /><br />
+            <br />
             The electronic speed controllers must also be calibrated. This allows them to adjust for the minimum and maximum levels to be sent to each motor. This was slightly problematic in our case with the one motor running consistently slower than the others. Calibrating the ESCs helped adjust for this but did not entirely resolve the problem. Calibration of the ESCs requires a carefully timed power off of the entire board and then a re-initialization into a calibration mode. Repeatable with some practice, but initially the ESCs could not be calibrated due to an inability to properly follow the directions to remove power.
-            <br /><br />
+            <br />
             <a href="http://aeroquad.com/content.php?118">Here</a> is a checklist of final things to test before moving on to PID tuning and flight.
-            
             </p>
 
-            <h3> PID tuning</h3>
+            <h3>PID tuning</h3>
             <p>
             Tuning of the controller must be done for each individual quad. The specifics of motor speed and size, frame material and balance, and other aspects of the construction mean that a proper PID tuning for one craft will likely not apply to one even slightly different. The tuning process is easiest to explain (and perform!) in the acrobatic mode. The document <a href="http://aeroquad.com/content.php?126-PID-Tuning-Your-AeroQuad">here</a> goes through a good description of the process. Basically, the terms that control how strongly the motors adjust for a change in orientation away from level are moved upwards until the craft strongly resists these changes. At this point, there is likely some significant oscillation going on, so the term that controls the decay of the response is adjusted until the oscillation goes away. Then the same is done for the other axis. This is all most easily accomplished when the craft is stably held in one hand and the other is used to adjust values. Watch out for the propellers!
             <br /><br />
@@ -367,14 +363,12 @@ http://gentlenav.googlecode.com/files/DCMDraft2.pdf">here</a>. This strategy is 
 				<h3>Other Useful Resources</h3>
 					<ul>
 						<li><a href="http://arduino.cc/en/">Arduino Home</a></li>
-						<li><a href="#">Nulla quis</a></li>
 					</ul>
 
 				<h3>Code Repositories</h3>
 					<ul>
 						<li><a href="git@github.com:arasbm/AeroQuadUVic">Aeroquad at UVic</a></li>
 						<li><a href="https://github.com/AeroQuad/AeroQuad">Official Aeroquad Repo</a></li>
-						<li><a href="#"></a></li>
 					</ul>
 
 				<h3>Related Websites</h3>

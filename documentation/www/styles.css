@@ -56,14 +56,14 @@ overflow: hidden;
 
 #content {
 float: left;
-width: 450px;
-margin-left: 40px;
+width: 580px;
+margin-left: 80px;
 }
 
 #sidebar1 {
 float: left;
 padding-left: 20px;
-width: 180px;
+width: 20px;
 }
 
 #sidebar2 {
